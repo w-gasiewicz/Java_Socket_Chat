@@ -1,7 +1,9 @@
 package tb.sockets.client;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.time.LocalDateTime;
 
@@ -13,27 +15,13 @@ public class Client extends javax.swing.JFrame {
     static Socket s;
     static DataInputStream dis;
     static DataOutputStream dos;
+    BufferedReader reader;
+    
     public Client() {
         initComponents();
     }
     
-    void startClient()
-    {
-                new Client().setVisible(true);
 
-        String msgin="";
-        try {             	
-            s=new Socket(getIp(),getPort());//1201-port localhost-server
-            dis=new DataInputStream(s.getInputStream());
-            dos=new DataOutputStream(s.getOutputStream());
-            while(msgin.equals("exit")){
-                msgin=dis.readUTF();
-                msg_area.setText(msg_area.getText().trim()+"\n"+msgin);
-            }
-        } catch (Exception e) {
-        	JOptionPane.showMessageDialog(msg_area,"NIE WYKRYTO SERWERA!");
-        }
-    }
     
    static String getIp()
    {
@@ -131,19 +119,19 @@ String set="U¿ytkownik: "+MainFrame.frmtdtxtfldXxxx2.getText();
         msg_text.setText("");
     }
 
-    public static void main(String args[]) {     
+   public static void main(String args[]) {     
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Client().setVisible(true);
             }
         });
-        String msgin="";
+       // String msgin="";
         try {             	
             s=new Socket(getIp(),getPort());//1201-port localhost-server
             dis=new DataInputStream(s.getInputStream());
             dos=new DataOutputStream(s.getOutputStream());
-            while(!msgin.equals("exit")){
-                msgin=dis.readUTF();
+            while(true){
+            	String msgin=dis.readUTF();
                 msg_area.setText(msg_area.getText().trim()+"\n"+msgin);
             }
         } catch (Exception e) {
@@ -151,6 +139,30 @@ String set="U¿ytkownik: "+MainFrame.frmtdtxtfldXxxx2.getText();
         }
     }
 
+    
+    void startClient()
+    {
+ 
+                new Client().setVisible(true);   
+        
+        try {             	
+            s=new Socket(getIp(),getPort());//1201-port localhost-server
+            
+            InputStreamReader streamreader = new InputStreamReader(s.getInputStream());
+            reader = new BufferedReader(streamreader);
+            
+            dis=new DataInputStream(s.getInputStream());
+            dos=new DataOutputStream(s.getOutputStream());
+            String msgin;
+            while((msgin= reader.readLine()) != null){
+            	msgin=dis.readUTF();
+                msg_area.setText(msg_area.getText().trim()+"\n"+msgin);
+            }
+        } catch (Exception e) {
+        	JOptionPane.showMessageDialog(msg_area,"NIE WYKRYTO SERWERA!");
+        }
+    }
+    
     private javax.swing.JButton btnSend;
     private javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JTextArea msg_area;

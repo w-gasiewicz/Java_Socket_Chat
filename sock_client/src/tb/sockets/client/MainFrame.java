@@ -3,17 +3,18 @@ package tb.sockets.client;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import tb.sockets.server.Server;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JFormattedTextField;
 import java.awt.Color;
 
@@ -24,9 +25,15 @@ public class MainFrame extends JFrame implements ActionListener{
 	Socket sSock;
 	static JFormattedTextField frmtdtxtfldXxxx = new JFormattedTextField();
 	static JFormattedTextField frmtdtxtfldXxxx2 = new JFormattedTextField();
-	JLabel lblNotConnected = new JLabel("Not Connected");
+	JLabel lblNotConnected = new JLabel("Nie po³¹czono"); 
 	static JFormattedTextField frmtdtxtfldIp=new JFormattedTextField();
 	String client_IP;
+	static boolean started=true;
+	
+	 	static Socket s;
+	    static DataInputStream dis;
+	    static DataOutputStream dos;
+	    
 	/**
 	 * Launch the application.
 	 */
@@ -48,7 +55,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	 */
 	public MainFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 650, 500);
+		setBounds(100, 100, 750, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -70,12 +77,12 @@ public class MainFrame extends JFrame implements ActionListener{
 			contentPane.add(frmtdtxtfldIp);
 
 		
-		JButton btnConnect = new JButton("Connect");
+		JButton btnConnect = new JButton("Po³¹cz");
 		btnConnect.setBounds(10, 90, 95, 23);
 		contentPane.add(btnConnect);
 		
 		btnConnect.addActionListener(this);
-		
+				
 		frmtdtxtfldXxxx.setText("1201");
 		frmtdtxtfldXxxx.setBounds(43, 39, 90, 20);
 		contentPane.add(frmtdtxtfldXxxx);
@@ -93,33 +100,129 @@ public class MainFrame extends JFrame implements ActionListener{
 		lblNick.setBounds(10, 68, 46, 14);
 		contentPane.add(lblNick);
 		
-		OrderPane panel = new OrderPane();
-		panel.setBounds(145, 14, 487, 448);
-		contentPane.add(panel);
-		
 		lblNotConnected.setForeground(new Color(255, 255, 255));
-		lblNotConnected.setBackground(new Color(128, 128, 128));
 		lblNotConnected.setOpaque(true);
 		lblNotConnected.setBounds(10, 115, 123, 23);
+		lblNotConnected.setBackground(Color.RED);
 		contentPane.add(lblNotConnected);
 		
-	}
-	public void actionPerformed(ActionEvent event) {
-		//String s="U¿ytkownik:"+" "+frmtdtxtfldXxxx2.getText();
-		// new Client().setVisible(true);
-		
-               /* new Server().startServer();
-                try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}*/
-             new Client().startClient();
+		  jScrollPane1 = new javax.swing.JScrollPane();
+	        msg_area = new javax.swing.JTextArea();
+	        msg_text = new javax.swing.JTextField();
+	        btnSend = new javax.swing.JButton();
 
-	                lblNotConnected.setText("Connected");
-	                lblNotConnected.setBackground(Color.GREEN);
+
+	        msg_area.setColumns(20);
+	        msg_area.setRows(5);
+	        jScrollPane1.setViewportView(msg_area);
+	        jScrollPane1.setBounds(145, 14, 487, 448);
+	        contentPane.add(jScrollPane1);
+
+	        btnSend.setText("Wyœlij");
+	        btnSend.setBounds(560,465, 70, 30);
+	        contentPane.add(btnSend);
+	       
+	        btnSend.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                btnSendActionPerformed(evt);
+	            }
+	        });
+	        
+	        msg_text.setBounds(145,465, 400, 30);
+	        contentPane.add(msg_text);
+}
+	public void actionPerformed(ActionEvent event) {
+
+          //   new Client().startClient();
 	                
+	                String set="U¿ytkownik: "+MainFrame.frmtdtxtfldXxxx2.getText();
 	                
+	                setTitle(set);
+					MainFrame.startChat();
+					
+					if(started==true)
+						{
+		                lblNotConnected.setText("Po³¹czono");
+		                lblNotConnected.setBackground(Color.GREEN);
+		                JOptionPane.showMessageDialog(this,"Po³¹czono z serwerem");
+						}
+					else
+					{
+						lblNotConnected.setText("NIe po³¹czono");
+		                lblNotConnected.setBackground(Color.RED);
+					}
 	};
 	
+    private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {
+        String msgout="";
+        LocalDateTime now = LocalDateTime.now();
+        Integer hour = now.getHour();
+        Integer minute = now.getMinute();
+        Integer second = now.getSecond();
+        String time=hour.toString()+":"+minute.toString()+":"+second.toString()+" ";
+       try {
+           msgout=msg_text.getText().trim();
+           if (msg_text.getText().equals(""))
+           {
+           	 JOptionPane.showMessageDialog(this,"Nie mo¿na wys³aæ pustej wiadomoœci!");
+           }
+           else{
+           	dos.writeUTF(time +" Client: "+msgout);  
+           	msg_area.setText(msg_area.getText().trim()+"\n"+time + msg_text.getText());
+           	
+           	}
+           
+       } catch (Exception e) {
+       }
+       
+       msg_text.setText("");
+   }
+	
+    private javax.swing.JButton btnSend;
+    private javax.swing.JScrollPane jScrollPane1;
+    private static javax.swing.JTextArea msg_area;
+    private javax.swing.JTextField msg_text;
+    
+    static void startChat()
+    {String msgin="";
+        try {             	
+            s=new Socket(getIp(),getPort());//1201-port localhost-server
+            dis=new DataInputStream(s.getInputStream());
+            dos=new DataOutputStream(s.getOutputStream());
+            while(msgin.equals("exit")){
+            	msgin=dis.readUTF();
+                msg_area.setText(msg_area.getText().trim()+"\n"+msgin);
+            }
+            
+        } catch (Exception e) {
+        	JOptionPane.showMessageDialog(msg_area,"NIE WYKRYTO SERWERA!");
+        	started=false;
+        }
+    }
+    
+    static String getIp()
+    {
+    	String ip;
+ 		if(frmtdtxtfldIp.getText().equals(""))
+     	{
+     		ip="localhost";
+     	}
+     	else{ip=frmtdtxtfldIp.getText();}
+ 		return ip;
+    }
+    
+    static int getPort()
+    {
+ 	   int intport;
+    	
+    	if(frmtdtxtfldXxxx.getText().equals(""))
+    	{
+    		intport=1201;
+    	}
+    	else{
+    		String port=frmtdtxtfldXxxx.getText();
+        	intport=Integer.parseInt(port);
+    	}  
+ 	return intport;
+    }
 }

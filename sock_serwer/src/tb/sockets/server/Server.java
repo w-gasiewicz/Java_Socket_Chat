@@ -1,7 +1,10 @@
 package tb.sockets.server;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
@@ -20,35 +23,6 @@ public class Server extends javax.swing.JFrame {
     public Server() {
         initComponents();
     }
-public void startServer()
-{
-    java.awt.EventQueue.invokeLater(new Runnable() {
-        public void run() {
-            new Server().setVisible(true);
-            active=true;
-        }
-    });
-    
-    String msgin = "";
-    try {
-        ss = new ServerSocket(1201);
-        s = ss.accept();
-        dis = new DataInputStream(s.getInputStream());
-        dos = new DataOutputStream(s.getOutputStream());
-        while (!msgin.equals("exit")) {
-            msgin = dis.readUTF();
-            msg_area.setText(msg_area.getText().trim() + "\n" + msgin);
-
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-
-public boolean active()
-{
-	return active;
-}
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -139,6 +113,7 @@ public boolean active()
         try {
             ss = new ServerSocket(1201);
             s = ss.accept();
+            //ss.close();
             dis = new DataInputStream(s.getInputStream());
             dos = new DataOutputStream(s.getOutputStream());
             while (!msgin.equals("exit")) {
@@ -146,9 +121,22 @@ public boolean active()
                 msg_area.setText(msg_area.getText().trim() + "\n" + msgin);
 
             }
+            /*            
+            PrintWriter out = new PrintWriter(s.getOutputStream(),true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+            String line;
+            while((line = in.readLine()) != null)
+            {
+            	msg_area.setText(msg_area.getText().trim() + "\n" + line);
+            }
+            ss.close();
+            */
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
     }
     
     private javax.swing.JButton btnSend;
